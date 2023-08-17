@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Text;
 using ArchitectCodingChallenge.Domain.Models;
+using ArchitectCodingChallenge.Infrastructure.Persistence.Abstractions;
 using ArchitectCodingChallenge.Infrastructure.Persistence.InMemoryDatabase.Abstractions;
 using Newtonsoft.Json;
 
@@ -22,13 +23,25 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
     private const string S_DEFAULT_PEOPLE_JSON_FILENAME = "people.json";
     #endregion
 
+    #region Fields
+    /// <summary>
+    /// Represents the service that handles IO opertions of the file system.
+    /// </summary>
+    private readonly IFileIOWrapper _fileIO;
+    #endregion
+
     #region Ctor
     /// <summary>
     /// Initializes a new instance of the class <see cref="JsonInMemoryDatabaseContext"/>.
     /// </summary>
-    private JsonInMemoryDatabaseContext() {
-        if (!string.IsNullOrWhiteSpace(DataDirectory) && !Directory.Exists(DataDirectory)) {
-            Directory.CreateDirectory(DataDirectory);
+    /// <param name="_fileIO">Service that handles IO operations of the file system.</param>
+    public JsonInMemoryDatabaseContext(
+        IFileIOWrapper fileIOWrapper
+    ) {
+        _fileIO = fileIOWrapper ?? throw new ArgumentNullException(nameof(fileIOWrapper));
+
+        if (!string.IsNullOrWhiteSpace(DataDirectory) && !_fileIO.DirectoryExists(DataDirectory)) {
+            _fileIO.CreateDirectory(DataDirectory);
         }
         ResourceAssembly = typeof(Application.AssemblyReference).Assembly;
         FullQualifiedNamePeopleJsonFile = S_DEFAULT_FULL_QUALIFIED_NAME_PEOPLE_JSON_FILE;
@@ -43,7 +56,7 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
     public DatabaseContextTarget DatabaseContextTarget { get; private set; } = DatabaseContextTarget.InMemory; // Here we can choose the target database system
 
     /// <inheritdoc/>
-    public string? DataDirectory => $"{Path.GetDirectoryName(typeof(AssemblyReference).Assembly.Location)}/data";
+    public string? DataDirectory => $"{_fileIO.GetDirectoryName(typeof(AssemblyReference).Assembly.Location)}/data";
 
     /// <inheritdoc/>
     public string? PeopleJsonFilename => $"{DataDirectory}/{S_DEFAULT_PEOPLE_JSON_FILENAME}";
@@ -89,8 +102,8 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
         }
 
         string peopleRawData = peopleReader.ReadToEnd();
-        if (!string.IsNullOrWhiteSpace(PeopleJsonFilename) && !File.Exists(PeopleJsonFilename)) {
-            File.AppendAllText(PeopleJsonFilename, peopleRawData, Encoding.UTF8);
+        if (!string.IsNullOrWhiteSpace(PeopleJsonFilename) && !_fileIO.FileExists(PeopleJsonFilename)) {
+            _fileIO.AppendAllText(PeopleJsonFilename, peopleRawData, Encoding.UTF8);
         }
 
         return true;
@@ -98,7 +111,7 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
 
     /// <inheritdoc/>
     public bool LoadPeopleDataSetFromFile(string? filename) {
-        if (string.IsNullOrWhiteSpace(filename) || !File.Exists(filename) || DatabaseContextTarget != DatabaseContextTarget.InMemory) {
+        if (string.IsNullOrWhiteSpace(filename) || !_fileIO.FileExists(filename) || DatabaseContextTarget != DatabaseContextTarget.InMemory) {
             return false;
         }
 
@@ -124,13 +137,5 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
 
     /// <inheritdoc/>
     public async Task<List<PersonModel>?> GetPeople() => People;
-    #endregion
-
-    #region Methods
-    /// <summary>
-    /// Factory method that creates a a new instance of the class <see cref="JsonInMemoryDatabaseContext"/>.
-    /// </summary>
-    /// <returns>Returns a new instance of the class <see cref="JsonInMemoryDatabaseContext"/> already configured for use.</returns>
-    public static JsonInMemoryDatabaseContext Create() => new();
     #endregion
 }

@@ -114,14 +114,16 @@ With this in mind, here I bring are some of the design thinking process I had, p
 > 
 > - I will use only the design patterns needed, priorizing quality and clearity over complexity and future possibilities when designing the API;
 > - Domain-Driven Design will be used: since I'm dealing with only one Entity, there is no need for Aggregates and Aggregate Roots, so I'll cut them off, making the Domain simpler. Value Objects, Result objects and another pre-requisites will be implemented if needed;
-> - I will be use the CQRS (Command and Query Responsability Segregation) pattern;
-> - I will be use the Mediator pattern;
+> - I will use the CQRS (Command and Query Responsability Segregation) pattern;
+> - I will use the Mediator pattern;
 > - Validation will be done functionaly using the FluentValidation framework;
 > - The project will follow the Microservices Architecture infrastructure model;
 > - The project will follow the Clean Architecture as its architectural design model;
 > - TDD will be used for testing using the XUnit framework;
 > - All excess components of the architecture that was not used will be cut, for example, Domain Events, Persistence to databases inside the Infrastructure layer, Messaging Broken, Message Bus, real time events, etc. These parts make the solution as a whole when looking for an implementation in the real world - which is not our case for this test purposes.
-> - I'll be creating a custom implementation of an *in-memory dataset to perform the required tasks**, which will load the json file in the system memory, and save it to disk if any changes were made.
+> - I will create a custom implementation of an *in-memory dataset to perform the required tasks**, which will load the json file in the system memory, and save it to disk if any changes were made.
+> - I will use Mocks and Fakes to improve the test coverage of the codebase. When needed I will use wrappers to provide unit testing funcionallity where could be dificult to implement unit tests, for example, when using a file system to access data;
+> - I will use exceptions only when absolutely necessary, improving the application performance by a large margin. Other than that, errors will be handled by Result Objects and custom error message objects.
 > - For the security layer, there will be using *Authentication* and *Authorization* within the specific credentials:
 > 
 > |User Name|Password|Roles|Query by Ranking?<br><sub>Question 1 (API 1)</sub>|Query by position Priority<br><sub>Question 2 (API 2)</sub>|Add new person?<br><sub>Bonus implementation</sub>|
@@ -129,7 +131,7 @@ With this in mind, here I bring are some of the design thinking process I had, p
 > |<code>admin</code>|<code>ArchitectCodingChallenge@ADMIN#123|<code> RankingReader<br>RankingWriter<br> Admin</code>| :white_check_mark: | :white_check_mark: | :white_check_mark: |
 > |<code>developer</code>|<code>ArchitectCodingChallenge@DEVELOPER#123</code>|<code>RankingReader</code>|:white_check_mark:|:white_check_mark:|:heavy_multiplication_x:|
 >
-> As for the tools, I made the following selections:
+> As for the tools, I selected:
 > - **Visual Studio 2022 Community, version 17.7.1** will be used to code and implement this solution;
 > - **ASP.NET Core with .NET 7.0 (STS)** will be used as the target framework;
 > - **C#, version 11** will be used as the language version for this solution;
@@ -141,7 +143,7 @@ With this in mind, here I bring are some of the design thinking process I had, p
 > - **FluentValidation, version 11.7.1 (package)** will be used as framework for strongly-type validation rules;
 > - **Xunit, version 2.5.0 (package)** will be used as framework for the unit test in TDD;
 > - **FluentAssertions, version 6.11.0** will be used as framework for the test unit assertions in a funcional way;
-> - **FluentResults, version 3..15.2** will be used for the Result Objects and handling the domain business rules instead of throwing exceptions. I will use exceptions only where  critically necessary, improving the application performance by a large margin.
+> - **FluentResults, version 3..15.2** will be used for the Result Objects and dealing with the domain business rules instead of throwing exceptions. 
 
 ## 4. The Results: Tests and validation process
 Now is time to put all things together and show the test results! 
