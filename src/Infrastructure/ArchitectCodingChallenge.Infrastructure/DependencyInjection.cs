@@ -19,7 +19,7 @@ public static class DependencyInjection {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services) {
         Assembly assembly = typeof(AssemblyReference).Assembly;
 
-        services.AddSingleton<IFileIOWrapper, FileIOWrapper>();
+        services.AddSingleton<IFileSystem, IFileSystem>();
 
         // Adds the custom In-memory Json database to the pipeline, with its default behavior, which is:
         // 1 - If the json file already exists in the "data" folder existing inside the running application assembly folder, load this file.
@@ -29,7 +29,7 @@ public static class DependencyInjection {
         //      existing inside the running application assembly folder.
         // 3 - Load the people.json data to the In-memory database context to use it inside the API.
         services.AddSingleton<IJsonInMemoryDatabaseContext, JsonInMemoryDatabaseContext>(
-            provider => new JsonInMemoryDatabaseContext(provider.GetRequiredService<IFileIOWrapper>())); // default behavior
+            provider => new JsonInMemoryDatabaseContext(provider.GetRequiredService<Persistence.Abstractions.IFileSystem>())); // default behavior
 
         return services;
     }

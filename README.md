@@ -143,7 +143,8 @@ With this in mind, here I bring are some of the design thinking process I had, p
 > - **FluentValidation, version 11.7.1 (package)** will be used as framework for strongly-type validation rules;
 > - **Xunit, version 2.5.0 (package)** will be used as framework for the unit test in TDD;
 > - **FluentAssertions, version 6.11.0** will be used as framework for the test unit assertions in a funcional way;
-> - **FluentResults, version 3..15.2** will be used for the Result Objects and dealing with the domain business rules instead of throwing exceptions. 
+> - **FluentResults, version 3..15.2** will be used for the Result Objects and dealing with the domain business rules instead of throwing exceptions;
+> - **Moq, version 4.20.69** will be used for mocking on unit testing;
 
 ## 4. The Results: Tests and validation process
 Now is time to put all things together and show the test results! 

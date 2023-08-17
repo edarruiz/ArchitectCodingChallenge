@@ -11,8 +11,8 @@ namespace ArchitectCodingChallenge.Infrastructure.Persistence.Services;
 /// <remarks>
 /// This interface wraps some of the <see cref="Directory"/>, <see cref="Path"/> and <see cref="File"/> class methods.
 /// </remarks>
-public sealed class FileIOWrapper : IFileIOWrapper {
-    #region IFileIOWrapper
+public sealed class FileSystem : IFileSystem {
+    #region IFileSystem
     /// <inheritdoc/>
     public void AppendAllText(string path, string? contents, Encoding encoding) => File.AppendAllText(path, contents, encoding);
 

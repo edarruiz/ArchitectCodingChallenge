@@ -10,7 +10,7 @@ namespace ArchitectCodingChallenge.Infrastructure.Persistence.Abstractions;
 /// <remarks>
 /// This interface wraps some of the <see cref="Directory"/>, <see cref="Path"/> and <see cref="File"/> class methods.
 /// </remarks>
-public interface IFileIOWrapper {
+public interface IFileSystem {
     /// <summary>
     /// Wraps the <see cref="Directory.CreateDirectory(string)"/> class method.
     /// <para>Creates all directories and subdirectories in the specified path with the specified permissions unless they already exist.</para>

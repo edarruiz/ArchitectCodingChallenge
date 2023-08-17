@@ -6,8 +6,7 @@ namespace ArchitectCodingChallenge.Infrastructure.Persistence.InMemoryDatabase.E
 /// Represents a Json In-memory database exception.
 /// </summary>
 [Serializable]
-public class JsonInMemoryDatabaseException : Exception
-{
+public class JsonInMemoryDatabaseException : Exception {
     #region Ctor
     /// <summary>
     /// Initializes a new instance of the class <see cref="JsonInMemoryDatabaseException"/>.

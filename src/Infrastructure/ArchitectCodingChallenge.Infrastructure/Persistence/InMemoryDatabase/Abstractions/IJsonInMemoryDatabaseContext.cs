@@ -67,19 +67,6 @@ public interface IJsonInMemoryDatabaseContext : IPersistenceDatabaseContext {
     /// <returns>Returns <c>true</c> when the "people.json" file contents was loaded sucessfully in-memory; <c>false</c> otherwise.</returns>
     bool LoadPeopleDataSetFromFile(string? filename);
 
-    /// <summary>
-    /// Check if the file named "people.json" exists inside the <see cref="Assembly"/> as an embedded resource.
-    /// </summary>
-    /// <returns>Returns <c>true</c> if the file exists inside the <see cref="Assembly"/> as an embedded resource;
-    /// <c>false</c> otherwise.</returns>
-    bool PeopleFileExistsAsEmbeddedResource();
-
-    /// <summary>
-    /// Check if the <see cref="Assembly"/> exists.
-    /// </summary>
-    /// <returns>Returns <c>true</c> if the <see cref="Assembly"/> is not null; <c>false</c> otherwise.</returns>
-    bool AssemblyExists();
-
     Task<List<PersonModel>?> GetPeople();
     #endregion
 }

@@ -27,21 +27,21 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
     /// <summary>
     /// Represents the service that handles IO opertions of the file system.
     /// </summary>
-    private readonly IFileIOWrapper _fileIO;
+    private readonly IFileSystem _fs;
     #endregion
 
     #region Ctor
     /// <summary>
     /// Initializes a new instance of the class <see cref="JsonInMemoryDatabaseContext"/>.
     /// </summary>
-    /// <param name="_fileIO">Service that handles IO operations of the file system.</param>
+    /// <param name="fileSystem">Service that handles IO operations of the file system.</param>
     public JsonInMemoryDatabaseContext(
-        IFileIOWrapper fileIOWrapper
+        IFileSystem? fileSystem
     ) {
-        _fileIO = fileIOWrapper ?? throw new ArgumentNullException(nameof(fileIOWrapper));
+        _fs = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
 
-        if (!string.IsNullOrWhiteSpace(DataDirectory) && !_fileIO.DirectoryExists(DataDirectory)) {
-            _fileIO.CreateDirectory(DataDirectory);
+        if (!string.IsNullOrWhiteSpace(DataDirectory) && !_fs.DirectoryExists(DataDirectory)) {
+            _fs.CreateDirectory(DataDirectory);
         }
         ResourceAssembly = typeof(Application.AssemblyReference).Assembly;
         FullQualifiedNamePeopleJsonFile = S_DEFAULT_FULL_QUALIFIED_NAME_PEOPLE_JSON_FILE;
@@ -56,7 +56,7 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
     public DatabaseContextTarget DatabaseContextTarget { get; private set; } = DatabaseContextTarget.InMemory; // Here we can choose the target database system
 
     /// <inheritdoc/>
-    public string? DataDirectory => $"{_fileIO.GetDirectoryName(typeof(AssemblyReference).Assembly.Location)}/data";
+    public string? DataDirectory => $"{_fs.GetDirectoryName(typeof(AssemblyReference).Assembly.Location)}/data";
 
     /// <inheritdoc/>
     public string? PeopleJsonFilename => $"{DataDirectory}/{S_DEFAULT_PEOPLE_JSON_FILENAME}";
@@ -77,7 +77,7 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
     public bool Connect() {
         Connected = false;
         if (!LoadPeopleDataSetFromFile(PeopleJsonFilename)) {
-            if (PeopleFileExistsAsEmbeddedResource() && AssemblyExists()) {
+            if (!string.IsNullOrWhiteSpace(FullQualifiedNamePeopleJsonFile) && ResourceAssembly is not null) {
                 Connected = LoadPeopleDataSetFromAssembly() && LoadPeopleDataSetFromFile(PeopleJsonFilename);
             }
         } else {
@@ -102,8 +102,8 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
         }
 
         string peopleRawData = peopleReader.ReadToEnd();
-        if (!string.IsNullOrWhiteSpace(PeopleJsonFilename) && !_fileIO.FileExists(PeopleJsonFilename)) {
-            _fileIO.AppendAllText(PeopleJsonFilename, peopleRawData, Encoding.UTF8);
+        if (!string.IsNullOrWhiteSpace(PeopleJsonFilename) && !_fs.FileExists(PeopleJsonFilename)) {
+            _fs.AppendAllText(PeopleJsonFilename, peopleRawData, Encoding.UTF8);
         }
 
         return true;
@@ -111,12 +111,12 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
 
     /// <inheritdoc/>
     public bool LoadPeopleDataSetFromFile(string? filename) {
-        if (string.IsNullOrWhiteSpace(filename) || !_fileIO.FileExists(filename) || DatabaseContextTarget != DatabaseContextTarget.InMemory) {
+        if (string.IsNullOrWhiteSpace(filename) || !_fs.FileExists(filename) || DatabaseContextTarget != DatabaseContextTarget.InMemory) {
             return false;
         }
 
         try {
-            using StreamReader peopleReader = File.OpenText(filename);
+            using StreamReader peopleReader = _fs.OpenText(filename);
             string peopleRawData = peopleReader.ReadToEnd();
             if (!string.IsNullOrWhiteSpace(peopleRawData)) {
                 People = JsonConvert.DeserializeObject<List<PersonModel>?>(peopleRawData);
@@ -128,12 +128,6 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
 
         return true;
     }
-
-    /// <inheritdoc/>
-    public bool PeopleFileExistsAsEmbeddedResource() => !(string.IsNullOrWhiteSpace(FullQualifiedNamePeopleJsonFile));
-
-    /// <inheritdoc/>
-    public bool AssemblyExists() => ResourceAssembly is not null;
 
     /// <inheritdoc/>
     public async Task<List<PersonModel>?> GetPeople() => People;
