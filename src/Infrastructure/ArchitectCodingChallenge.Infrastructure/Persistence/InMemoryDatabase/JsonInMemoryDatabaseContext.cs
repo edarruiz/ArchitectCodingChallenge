@@ -1,5 +1,8 @@
 ﻿using System.Reflection;
+using System.Text;
+using ArchitectCodingChallenge.Domain.Models;
 using ArchitectCodingChallenge.Infrastructure.Persistence.InMemoryDatabase.Abstractions;
+using Newtonsoft.Json;
 
 namespace ArchitectCodingChallenge.Infrastructure.Persistence.InMemoryDatabase;
 
@@ -12,28 +15,23 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
     /// Represents the full qualified name of the file named "people.json" inside the assembly as an embedded resource.
     /// </summary>
     private const string S_DEFAULT_FULL_QUALIFIED_NAME_PEOPLE_JSON_FILE = "ArchitectCodingChallenge.Application.Data.people.json";
+
+    /// <summary>
+    /// Represents the dataset Json file name where the people information is stored.
+    /// </summary>
+    private const string S_DEFAULT_PEOPLE_JSON_FILENAME = "people.json";
     #endregion
 
     #region Ctor
     /// <summary>
-    /// Initializes a new instance of the class <see cref="JsonInMemoryDatabaseContext"/> with the
-    /// full qualified name of the file named "people.json" inside the assembly as an embedded resource
-    /// and with the <see cref="Assembly"/> containing this file.
+    /// Initializes a new instance of the class <see cref="JsonInMemoryDatabaseContext"/>.
     /// </summary>
-    /// <param name="fullQualifiedNamePeopleJsonFile">The full qualified name of the dataset named "people.json", 
-    /// as an embedded resource file inside an assembly.</param>
-    /// <param name="resourceAssembly">The <see cref="Assembly"/> containing the file named "people.json" 
-    /// as an embedded resource file.</param>
-    private JsonInMemoryDatabaseContext(
-        string fullQualifiedNamePeopleJsonFile,
-        Assembly resourceAssembly
-    ) {
-        ResourceAssembly = (resourceAssembly is null)
-            ? typeof(Application.AssemblyReference).Assembly
-            : resourceAssembly;
-        FullQualifiedNamePeopleJsonFile = (string.IsNullOrWhiteSpace(fullQualifiedNamePeopleJsonFile))
-            ? S_DEFAULT_FULL_QUALIFIED_NAME_PEOPLE_JSON_FILE
-            : fullQualifiedNamePeopleJsonFile;
+    private JsonInMemoryDatabaseContext() {
+        if (!string.IsNullOrWhiteSpace(DataDirectory) && !Directory.Exists(DataDirectory)) {
+            Directory.CreateDirectory(DataDirectory);
+        }
+        ResourceAssembly = typeof(Application.AssemblyReference).Assembly;
+        FullQualifiedNamePeopleJsonFile = S_DEFAULT_FULL_QUALIFIED_NAME_PEOPLE_JSON_FILE;
     }
     #endregion
 
@@ -42,50 +40,80 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
     public Guid DatabaseContextId { get; init; } = Guid.NewGuid(); // This Guid exists just for connection trace and log purposes.
 
     /// <inheritdoc/>
-    public DatabaseContextTarget DatabaseContextTarget { get; private set; } = DatabaseContextTarget.Unknown; // Here we can choose the target database system
+    public DatabaseContextTarget DatabaseContextTarget { get; private set; } = DatabaseContextTarget.InMemory; // Here we can choose the target database system
 
     /// <inheritdoc/>
-    public string? FullQualifiedNamePeopleJsonFile { get; }
+    public string? DataDirectory => $"{Path.GetDirectoryName(typeof(AssemblyReference).Assembly.Location)}/data";
 
     /// <inheritdoc/>
-    public Assembly? ResourceAssembly { get; }
+    public string? PeopleJsonFilename => $"{DataDirectory}/{S_DEFAULT_PEOPLE_JSON_FILENAME}";
+
+    /// <inheritdoc/>
+    public string? FullQualifiedNamePeopleJsonFile { get; init; }
+
+    /// <inheritdoc/>
+    public Assembly? ResourceAssembly { get; init; }
+
+    /// <inheritdoc/>
+    public List<PersonModel>? People { get; private set; } = new List<PersonModel>();
 
     /// <inheritdoc/>
     public bool Connected { get; private set; } = false;
 
     /// <inheritdoc/>
     public bool Connect() {
-        Connected = PeopleFileExistsAsEmbeddedResource() && AssemblyExists();
-        DatabaseContextTarget = Connected
-            ? DatabaseContextTarget.InMemory
-            : DatabaseContextTarget.Unknown;
+        Connected = false;
+        if (!LoadPeopleDataSetFromFile(PeopleJsonFilename)) {
+            if (PeopleFileExistsAsEmbeddedResource() && AssemblyExists()) {
+                Connected = LoadPeopleDataSetFromAssembly() && LoadPeopleDataSetFromFile(PeopleJsonFilename);
+            }
+        } else {
+            Connected = true;
+        }
 
         return Connected;
     }
 
     /// <inheritdoc/>
     public bool LoadPeopleDataSetFromAssembly() {
-        Connect();
-        if (Connected && (DatabaseContextTarget == DatabaseContextTarget.InMemory)) {
-            using Stream? peopleFileStream = ResourceAssembly?.GetManifestResourceStream(FullQualifiedNamePeopleJsonFile ?? string.Empty);
-            if (peopleFileStream is null) {
-                return false;
-            }
-
-            using StreamReader peopleFileReader = new(peopleFileStream);
-            if (peopleFileReader is null) {
-                return false;
-            }
-
-            string peopleRawData = peopleFileReader.ReadToEnd();
+        if (DatabaseContextTarget != DatabaseContextTarget.InMemory) {
+            return false;
+        }
+        using Stream? peopleStream = ResourceAssembly?.GetManifestResourceStream(FullQualifiedNamePeopleJsonFile ?? string.Empty);
+        if (peopleStream is null) {
+            return false;
+        }
+        using StreamReader peopleReader = new(peopleStream);
+        if (peopleReader is null) {
+            return false;
         }
 
-        return false;
+        string peopleRawData = peopleReader.ReadToEnd();
+        if (!string.IsNullOrWhiteSpace(PeopleJsonFilename) && !File.Exists(PeopleJsonFilename)) {
+            File.AppendAllText(PeopleJsonFilename, peopleRawData, Encoding.UTF8);
+        }
+
+        return true;
     }
 
     /// <inheritdoc/>
     public bool LoadPeopleDataSetFromFile(string? filename) {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(filename) || !File.Exists(filename) || DatabaseContextTarget != DatabaseContextTarget.InMemory) {
+            return false;
+        }
+
+        try {
+            using StreamReader peopleReader = File.OpenText(filename);
+            string peopleRawData = peopleReader.ReadToEnd();
+            if (!string.IsNullOrWhiteSpace(peopleRawData)) {
+                People = JsonConvert.DeserializeObject<List<PersonModel>?>(peopleRawData);
+            }
+        } catch (Exception ex) {
+            // TODO: log the exception
+            return false;
+        }
+
+        return true;
     }
 
     /// <inheritdoc/>
@@ -93,26 +121,16 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
 
     /// <inheritdoc/>
     public bool AssemblyExists() => ResourceAssembly is not null;
+
+    /// <inheritdoc/>
+    public async Task<List<PersonModel>?> GetPeople() => People;
     #endregion
 
     #region Methods
     /// <summary>
-    /// Factory method that creates a a new instance of the class <see cref="JsonInMemoryDatabaseContext"/> with the
-    /// full qualified name of the file named "people.json" inside the assembly as an embedded resource
-    /// and with the <see cref="Assembly"/> containing this file.
+    /// Factory method that creates a a new instance of the class <see cref="JsonInMemoryDatabaseContext"/>.
     /// </summary>
-    /// <param name="fullQualifiedNamePeopleDatasetJsonFile">The full qualified name of the dataset named "people.json", 
-    /// as an embedded resource file inside an assembly.</param>
-    /// <param name="assemblyResourceDataSet">The <see cref="Assembly"/> containing the file named "people.json" 
-    /// as an embedded resource file.</param>
-    /// <returns>Returns a new instance of the class <see cref="JsonInMemoryDatabaseContext"/> already
-    /// configured for use if the embedded resource file exists inside the assembly; If the embedded 
-    /// resource file doest not exists inside the assembly as an embedded resource, returns a new
-    /// <see cref="JsonInMemoryDatabaseContext"/> pointing to the Application layer assembly, and use it
-    /// as the default data source for the database context.</returns>
-    public static JsonInMemoryDatabaseContext Create(
-        string fullQualifiedNamePeopleDatasetJsonFile,
-        Assembly assemblyResourceDataSet
-    ) => new(fullQualifiedNamePeopleDatasetJsonFile, assemblyResourceDataSet);
+    /// <returns>Returns a new instance of the class <see cref="JsonInMemoryDatabaseContext"/> already configured for use.</returns>
+    public static JsonInMemoryDatabaseContext Create() => new();
     #endregion
 }

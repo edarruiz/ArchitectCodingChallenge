@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using ArchitectCodingChallenge.Domain.Models;
 using ArchitectCodingChallenge.Infrastructure.Persistence.Abstractions;
 
 namespace ArchitectCodingChallenge.Infrastructure.Persistence.InMemoryDatabase.Abstractions;
@@ -12,6 +13,18 @@ namespace ArchitectCodingChallenge.Infrastructure.Persistence.InMemoryDatabase.A
 public interface IJsonInMemoryDatabaseContext : IPersistenceDatabaseContext {
     #region Properties
     /// <summary>
+    /// Gets the data directory where the json files should exist or should be created.
+    /// </summary>
+    /// <remarks>This directory is automatically created if not exists, and its location root is the same of the current running assembly.
+    /// </remarks>
+    string? DataDirectory { get; }
+
+    /// <summary>
+    /// Gets the full path and file name of the dataset Json file name where the people information is stored.
+    /// </summary>
+    string? PeopleJsonFilename { get; }
+
+    /// <summary>
     /// Gets or sets the full qualified name of the dataset named "people.json", as an embedded resource file inside an assembly.
     /// </summary>
     string? FullQualifiedNamePeopleJsonFile { get; }
@@ -20,6 +33,11 @@ public interface IJsonInMemoryDatabaseContext : IPersistenceDatabaseContext {
     /// Gets or sets the <see cref="Assembly"/> containing the file named "people.json" as an embedded resource file.
     /// </summary>
     Assembly? ResourceAssembly { get; }
+
+    /// <summary>
+    /// Gets the <see cref="List{T}"/> representing the collection of <see cref="PersonModel"/>.
+    /// </summary>
+    List<PersonModel>? People { get; }
 
     /// <summary>
     /// Checks if the In-memory database is ready and available for operations.
@@ -61,5 +79,7 @@ public interface IJsonInMemoryDatabaseContext : IPersistenceDatabaseContext {
     /// </summary>
     /// <returns>Returns <c>true</c> if the <see cref="Assembly"/> is not null; <c>false</c> otherwise.</returns>
     bool AssemblyExists();
+
+    Task<List<PersonModel>?> GetPeople();
     #endregion
 }
