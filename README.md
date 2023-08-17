@@ -128,15 +128,15 @@ With this in mind, here I bring are some of the design thinking process I had, p
 > - The project will follow the Clean Architecture as its architectural design model;
 > - TDD will be used for testing using the XUnit framework;
 > - All excess components of the architecture that was not used will be cut, for example, Domain Events, Persistence to databases inside the Infrastructure layer, Messaging Broken, Message Bus, real time events, etc. These parts make the solution as a whole when looking for an implementation in the real world - which is not our case for the test purposes.
-> - In normal software development conditions, a database would exist as the main data source, being a relational or NoSQL depending on the business and technological needs, representing a huge part of the system backbone. For this implementation, putting a database system inside this test just could prove I have knowledge using this tools, ORMs, systems and frameworks, but at the cost of creating an overhead of layers not explicitly needed by this test rules. For the sake of simplicity, I'll be using *in-memory* datasets to perform the required tasks. I could also use an in-memory databasem like SQLite, but I think it's overkill right now.
-> - For the security layer, there will be using *Authentication* and *Authorization* within this specific credentials:
+> - In normal software development conditions, a database would exist as the main data source, being a relational or NoSQL depending on the business and technological needs, representing a huge part of the system backbone. For this implementation, putting a database system inside this test just could prove I have knowledge using this tools, ORMs, systems and frameworks, but at the cost of creating an overhead of layers not explicitly needed by this test rules. For the sake of simplicity, **I'll be using *in-memory* datasets to perform the required tasks.** I could also use an in-memory database like SQLite, but I think it's overkill right now.
+> - For the security layer, there will be using *Authentication* and *Authorization* within the specific credentials:
 > 
 > |User Name|Password|Roles|Query by Ranking?<br><sub>Question 1 (API 1)</sub>|Query by position Priority<br><sub>Question 2 (API 2)</sub>|Add new person?<br><sub>Bonus implementation</sub>|
 > |---|---|---|---|---|---|
 > |<code>admin</code>|<code>ArchitectCodingChallenge@ADMIN#123|<code> RankingReader<br>RankingWriter<br> Admin</code>| :white_check_mark: | :white_check_mark: | :white_check_mark: |
 > |<code>developer</code>|<code>ArchitectCodingChallenge@DEVELOPER#123</code>|<code>RankingReader</code>|:white_check_mark:|:white_check_mark:|:heavy_multiplication_x:|
 >
-> Within the tools, I decided using:
+> Within the tools, I made the following decisions:
 > - **Visual Studio 2022 Community, version 17.7.1** will be used to code and implement this solution;
 > - **ASP.NET Core with .NET 7.0 (STS)** will be used as the target framework;
 > - **C#, version 11** will be used as the language version for this solution;
@@ -146,12 +146,16 @@ With this in mind, here I bring are some of the design thinking process I had, p
 > - **Top-level statements** will be turned on for this solution;
 > - **MediatR, version 12.1.1 (package)** will be used as a framework for the Mediator Design Pattern;
 > - **FluentValidation, version 11.7.1 (package)** will be used as framework for strongly-type validation rules;
+> - **Xunit, version 2.5.0 (package)** will be used as framework for the unit test in TDD;
+> - **FluentAssertions, version 6.11.0** will be used as framework for the test unit assertions in a funcional way;
 >  
 
 ## 4. The Results: Tests and validation process
 Now is time to put all things together and show the results! 
 
 Once fully implemented, with the written unit tests and the test cases, I can show the results here, and the tests are available for any execution at any given time for you guys. This will prove the solution I create provide the actual behavior and expected results from the required implementation tasks of this project.
+
+I implemented the code, documentation, tests and evidence as if this test should be put in a production enviroment.
 
 Also, as a proof of the concept, I'm adding pictures working as evidences of the system working and running, for both two expected results: one for sucesses and one for error.
 

@@ -5,7 +5,7 @@ using FluentResults;
 namespace ArchitectCodingChallenge.Domain.Entities;
 
 /// <summary>
-/// Represents a person, a talent that could be potentially hired by the company. 
+/// Represents a person entity, a talent that could be potentially hired by the company. 
 /// </summary>
 public sealed class Person : Entity {
     #region Ctor
@@ -17,7 +17,7 @@ public sealed class Person : Entity {
     /// The constructor should be private to prevent the creation of a new instance of <see cref="Person"/> ouside the 
     /// factory method, where all the object validations are made.
     /// </remarks>
-    private Person(Guid? guid) : base(guid) {
+    private Person(Guid? guid = null) : base(guid) {
     }
     #endregion
 
@@ -92,6 +92,9 @@ public sealed class Person : Entity {
         if (id is null) {
             return Result.Fail<Person>(DomainErrors.Person.IdIsNull);
         }
+        if (id < 0) {
+            return Result.Fail<Person>(DomainErrors.Person.IdIsNegative);
+        }
         if (string.IsNullOrWhiteSpace(firstName)) {
             return Result.Fail<Person>(DomainErrors.Person.NameIsNullEmptyOrWhiteSpace);
         }
@@ -106,6 +109,12 @@ public sealed class Person : Entity {
         }
         if (string.IsNullOrWhiteSpace(industry)) {
             return Result.Fail<Person>(DomainErrors.Person.IndustryIsNullEmptyOrWhiteSpace);
+        }
+        if (numberOfRecomendations < 0) {
+            return Result.Fail<Person>(DomainErrors.Person.NumberOfRecomendationsIsNegative);
+        }
+        if (numberOfConnections < 0) {
+            return Result.Fail<Person>(DomainErrors.Person.NumberOfConnectionsIsNegative);
         }
 
         Person person = new(guid) {
