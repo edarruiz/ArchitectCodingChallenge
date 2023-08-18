@@ -64,7 +64,7 @@ public class PersonTests : IDisposable {
         var expected = "The person's unique identifier number cannot be a negative number.";
 
         // Act
-        var result = actual.IsFailed && actual.Errors.First().Message == expected;
+        var result = actual.IsFailed && actual.Errors.First().Message.Contains(expected);
 
         // Assert
         result.Should().BeTrue();
@@ -114,11 +114,11 @@ public class PersonTests : IDisposable {
         // Act
         var result =
             actualNull.IsFailed
-            && actualNull.Errors.First().Message == expected
+            && actualNull.Errors.First().Message.Contains(expected)
             && actualEmpty.IsFailed
-            && actualEmpty.Errors.First().Message == expected
+            && actualEmpty.Errors.First().Message.Contains(expected)
             && actualWhiteSpace.IsFailed
-            && actualWhiteSpace.Errors.First().Message == expected;
+            && actualWhiteSpace.Errors.First().Message.Contains(expected);
 
         // Assert
         result.Should().BeTrue();
@@ -168,11 +168,11 @@ public class PersonTests : IDisposable {
         // Act
         var result =
             actualNull.IsFailed
-            && actualNull.Errors.First().Message == expected
+            && actualNull.Errors.First().Message.Contains(expected)
             && actualEmpty.IsFailed
-            && actualEmpty.Errors.First().Message == expected
+            && actualEmpty.Errors.First().Message.Contains(expected)
             && actualWhiteSpace.IsFailed
-            && actualWhiteSpace.Errors.First().Message == expected;
+            && actualWhiteSpace.Errors.First().Message.Contains(expected);
 
         // Assert
         result.Should().BeTrue();
@@ -223,11 +223,11 @@ public class PersonTests : IDisposable {
         // Act
         var result =
             actualNull.IsFailed
-            && actualNull.Errors.First().Message == expected
+            && actualNull.Errors.First().Message.Contains(expected)
             && actualEmpty.IsFailed
-            && actualEmpty.Errors.First().Message == expected
+            && actualEmpty.Errors.First().Message.Contains(expected)
             && actualWhiteSpace.IsFailed
-            && actualWhiteSpace.Errors.First().Message == expected;
+            && actualWhiteSpace.Errors.First().Message.Contains(expected);
         // Assert
         result.Should().BeTrue();
     }
@@ -255,7 +255,7 @@ public class PersonTests : IDisposable {
         // Act
         var result =
             actual.IsFailed
-            && actual.Errors.First().Message == expected;
+            && actual.Errors.First().Message.Contains(expected);
         // Assert
         result.Should().BeTrue();
     }
@@ -283,7 +283,7 @@ public class PersonTests : IDisposable {
         // Act
         var result =
             actual.IsFailed
-            && actual.Errors.First().Message == expected;
+            && actual.Errors.First().Message.Contains(expected);
         // Assert
         result.Should().BeTrue();
     }

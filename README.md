@@ -4,7 +4,7 @@
 >
 > *I prepared this document to guide you through my test.*
 >
-> *Here you will find information not only about the solution I provide, but also about the process I went throught to think, decide, evaluate, create, implement, test and document every part required to provide the results of this test.*
+> *Here you will find all information related to the solution I provide for this test.*
 >
 > *I'd like to thank you for your time, and for your attention while reading my code and my documentation. I did my best to provide you a good experience while evaluanting my test.*
 >
@@ -17,9 +17,12 @@ This repository contains a proposed solution for test of .NET Architect Coding C
 
 - [.NET Architect Coding Challenge](#net-architect-coding-challenge)
   - [1. Abstract: The problem](#1-abstract-the-problem)
-  - [2. A Business Perspective: About my design thinking and decision making](#2-a-business-perspective-about-my-design-thinking-and-decision-making)
-  - [3. A Technology Perspective: About my design thinking, architecture and decision making](#3-a-technology-perspective-about-my-design-thinking-architecture-and-decision-making)
-  - [4. The Results: Tests and validation process](#4-the-results-tests-and-validation-process)
+  - [Answer 1](#answer-1)
+  - [Answer 2](#answer-2)
+  - [Answer 3](#answer-3)
+  - [Additional information](#additional-information)
+  - [2. My business perspective, design thinking and decision making for this solution](#2-my-business-perspective-design-thinking-and-decision-making-for-this-solution)
+  - [3. My technology perspective, design thinking, architecture and decision making for this solution](#3-my-technology-perspective-design-thinking-architecture-and-decision-making-for-this-solution)
   - [5. Conclusion](#5-conclusion)
 
 
@@ -62,24 +65,81 @@ From the original e-mail:
 }
 ]
 ```
-## 2. A Business Perspective: About my design thinking and decision making
+## Answer 1
+For this enpoint, I will create a <code>GET</code> method that will do the following:
+1. Load the dataset to an In-memory database, from the <code>people.json</code> file provided;
+2. Query all the data and filter the person's by its current <code>CurrentRole</code>, which needs to contains the word <code>developer</code> - which I defined being the key value to the ranking;
+3. Sort the results <code>ascending</code> by the field <code>PersonId</code>;
+4. Return all the results found as <code>application/json</code> within a <code>HTTP CODE: 200 (Ok)</code>.
+
+## Answer 2
+For this endpoint, I will create a <code>GET</code> method what will do the following:
+1. Load the dataset to an In-memory database, from the <code>people.json</code> file provided;
+2. Query all the data and filter the person's by its <code>PersonId</code> provided by the <code>query parameter</code> named <code>N</code>;
+3. Return results as <code>application/json</code> within the following <code>HTTP CODES</code>:
+   1. <code>200</code> - return the person's information when the person's <code>PersonId</code> exists.
+   2. <code>404</code> - return no results when the person's <code>PersonId</code> does not exists.
+
+## Answer 3
+For this endpoint, I will create a <code>POST</code> method that will do the following:
+1. Receive the information inside the request <code>body</code>, as <code>application/json</code>;
+2. Do the validations based on the provided data types, required and optional fields;
+3. Load the dataset to an In-memory database, from the <code>people.json</code> file provided;
+4. Add the new person to or a list of new persons to the In-memory dataset;
+5. Save the changes to the <code>people.json</code> file and write it to disk;
+6. Return a <code>HTTP CODE: 200 (Created)</code> with the results.
+   1. If the person already exists in the list, the operation will fail and return with the message *Failed: This PersonId already exists in the list*.
+   2. If the person does not exists in the list, will be added and return the message *Created successfully*.
+Example:
+```json
+[
+    {
+        "PersonId": 4580,
+        "StatusCode": 400,
+        "Message": "Failed: This PersonId already exists in the list."
+    },
+    {
+        "PersonId": 646171916,
+        "StatusCode": 400,
+        "Message": "Failed: This PersonId already exists in the list."
+    },
+    {
+        "PersonId": 458000,
+        "StatusCode": 201,
+        "Message": "Created successfully."
+    },
+    {
+        "PersonId": 646171916000,
+        "StatusCode": 201,
+        "Message": "Created successfully."
+    }   
+]
+```
+
+## Additional information
+You do not need to worry how the application loads the dataset from the json file. I put the <code>people.json</code> file as an embedded resource inside the application layer, so the API handles the file system needed to persist and query the required data. For this task I created a custom In-memory database implementation based on this test needs.
+
+I did not implemented the unit tests for all classes existing in the codebase, but to demonstrate I know how to use the patterns and the good pratices, I've implemented a lot of unit tests for the core classes, for example, inheritance core classes, domain core classes and infrastructure core classes, using both traditional unit tests and also using mocks and fakes.
+
+## 2. My business perspective, design thinking and decision making for this solution
 Every good software solution is always preceeded by a good understanding of the bussines needs, their goals, the market rules and the end-user expectations.
 
 With this in mind, here I bring are some of the design thinking process I had, pointing out the reasons behind each business decision was made to implement and complete this challenge:
 
-> **Thinking and understanding:** After analysing the datasource provided, I discovered the main problem pointed in the questions was not creating a rank the people with the highest chance of becoming our clients, listing and adding them.
+> **Thinking:** After analysing the datasource provided, I discovered the main problem pointed in the questions was not creating a rank the people with the highest chance of becoming our clients, listing and adding them.
 > 
 > The tricky business problem is somewhat hidden behind the lines, where I needed to UNDERSTAND and ASK: 
 > 
 > *From all information I had on this LinkedIn people dataset, what information is provided that I could find a diferentiation between them, and what information provided could be easily seen as a clear link for the company's vision, which is "our engineers are an extension of the client’s teams"?* - **I see this as a business target for this test.**
 >
 > After some querying and evaluation throughout the data, I ended up with some conclusions:
-> - There is no explicit filter or information inside the data that show what criteria to use when deciding *"who have the highest change of becoming the company client"*, as well there is no explicit information pointed in the question itself that helps me to find what information to use to create the ranking mechanism. **But, if we carefully read and try to understand the domain of the information**, which is the people, being a collection of persons, being each person a possible professional the company could hire, there are some specific information that should help me to answer this question. From all available information, I found the key informations are  their **current role** and their **industry**, existing in every person entity information;
-> - Even with this first two filters as key informations, I still need to decide exactly what information content I need to index to create a ranking. After analysing all the information available for each of this two attributes, I can choose which *current role* and which *industry* I should prioritize, resulting in the expected ranking. Since the question also is not explict about these specific values or the values I need to use, so I feel free to decide which information will compose the ranking. 
-> - I concluded I need to consider for the company hiring purposes, that people with *current roles* and *industry* related to technology, HR and management should be considered a higher priority targets. For the sake of simplicity, I'll be considering only people for the IT purposes, hiding the HR, management and C-level as possible targets.
+> - There is no explicit filter or information inside the data that show what criteria to use when deciding *"who have the highest change of becoming the company client"*, as well there is no explicit information pointed in the question itself that helps me to find what information to use to create the ranking mechanism. 
+> - **But, if I carefully read and try to understand the domain of the information**, which is the people, being a collection of persons, being each person a possible professional the company could hire, there are some specific information that should help me to answer this question.
+> - I found the key informations are  their **current role**, existing in every person entity information;
+> - I still need to decide exactly what values I need to filter to create a ranking. After analysing all the information available for each of this attribute, I can choose which *current role* I should prioritize, resulting in the expected ranking. Since the question also is not explict about these specific values or the values I need to use, so I feel free to decide which information will compose the ranking, being in this case, **any value containing the word <code>developer</code>.**
 > 
-> **Decision making and designing:**
-> Once I got a good grip of the information domain, the choosing information composing the ranking will be the following:
+> **Decision making:**
+> Once I got a good understanding of the information domain, the choosing information composing the ranking will be the following:
 > 
 > |Key|Objective|Ranking|Reasons|
 > |---|---|---|---|
@@ -88,12 +148,12 @@ With this in mind, here I bring are some of the design thinking process I had, p
 > |**LastName**|The person's last name|:heavy_multiplication_x:|Only used for querying and presenting. Does not represent a weight in the rank.|
 > |**CurrentRole**|The person's current role|:white_check_mark:|The current role is the most important information for the company hiring process. It should give me the set of values for the ranking composition.|
 > |**Country**|The person's country origin|:heavy_multiplication_x:|Since the company hires world-wide, it's not relevant for the ranking. Only used by indexing, presenting and querying. Does not represent a weight in the rank|
-> |**Industry**|The person's industry|:white_check_mark:|The industry of the person is the second most important information for the company hiring process. It should give me the set of values for the ranking composition.|
+> |**Industry**|The person's industry|:heavy_multiplication_x:|The industry of the person is the second most important information for the company hiring process. But will not be used right now for filtering.|
 > |**NumberOfRecommendations**|The person's # of LinkedIn recomendations|:heavy_multiplication_x:|The number of recomendations of a person is a good indicator, but also not reliable, since there is a lot of good professionals with no good recomendations. Could be used as an additional ranking set of values, but for now, it'll be discarded in our ranking. |
 > |**NumberOfConnections**|The person's # of connections|:heavy_multiplication_x:|The number of connections is a measure "how *well connected*/*connected* this person is". If we think in higher positions, for example, management, high leadership and c-level, maybe we should consider this, but anyway, its too specific at this moment. For now, it'll be discarded in our ranking.|
 
-## 3. A Technology Perspective: About my design thinking, architecture and decision making
-Once we already have a good grip of all business goals and needs, then we can proceed to start the discovery process of the technical solutions available at our disposal to reach the expected results. This is a crucial process.
+## 3. My technology perspective, design thinking, architecture and decision making for this solution
+After understanding all business goals and needs, then I can proceed to start the discovery process of the technical solutions available at my disposal to reach the expected results. This is a crucial process.
 
 With this in mind, here I bring are some of the design thinking process I had, pointing out the reasons behind each technical decision was made to implement and complete this challange:
 
@@ -124,13 +184,8 @@ With this in mind, here I bring are some of the design thinking process I had, p
 > - I will create a custom implementation of an *in-memory dataset to perform the required tasks**, which will load the json file in the system memory, and save it to disk if any changes were made.
 > - I will use Mocks and Fakes to improve the test coverage of the codebase. When needed I will use wrappers to provide unit testing funcionallity where could be dificult to implement unit tests, for example, when using a file system to access data;
 > - I will use exceptions only when absolutely necessary, improving the application performance by a large margin. Other than that, errors will be handled by Result Objects and custom error message objects.
-> - For the security layer, there will be using *Authentication* and *Authorization* within the specific credentials:
+> - For the security layer, I could use *Authentication* and *Authorization*, but it won't be implemented since its not a requirement.
 > 
-> |User Name|Password|Roles|Query by Ranking?<br><sub>Question 1 (API 1)</sub>|Query by position Priority<br><sub>Question 2 (API 2)</sub>|Add new person?<br><sub>Bonus implementation</sub>|
-> |---|---|---|---|---|---|
-> |<code>admin</code>|<code>ArchitectCodingChallenge@ADMIN#123|<code> RankingReader<br>RankingWriter<br> Admin</code>| :white_check_mark: | :white_check_mark: | :white_check_mark: |
-> |<code>developer</code>|<code>ArchitectCodingChallenge@DEVELOPER#123</code>|<code>RankingReader</code>|:white_check_mark:|:white_check_mark:|:heavy_multiplication_x:|
->
 > As for the tools, I selected:
 > - **Visual Studio 2022 Community, version 17.7.1** will be used to code and implement this solution;
 > - **ASP.NET Core with .NET 7.0 (STS)** will be used as the target framework;
@@ -145,27 +200,10 @@ With this in mind, here I bring are some of the design thinking process I had, p
 > - **FluentAssertions, version 6.11.0** will be used as framework for the test unit assertions in a funcional way;
 > - **FluentResults, version 3..15.2** will be used for the Result Objects and dealing with the domain business rules instead of throwing exceptions;
 > - **Moq, version 4.20.69** will be used for mocking on unit testing;
-
-## 4. The Results: Tests and validation process
-Now is time to put all things together and show the test results! 
-
-Once fully implemented, with the written unit tests and the test cases, I can show the results here, and the tests are available for any execution at any given time for you guys. This will prove the solution I create provide the actual behavior and expected results from the required implementation tasks of this project.
-
-Also, as a proof of the concept, I'm adding pictures as evidences of the system working and running, for both two expected results: one for sucesses and at least one for error.
-
-TODO: PRINT SUCCESS API 1
-TODO: PRINT ERROR API 1
-
-TODO: PRINT SUCCESS API 2
-TODO: PRINT ERROR API 2
-
-TODO: PRINT SUCCESS API 3
-TODO: PRINT ERROR API 3
+> - **Serilog, version 3.0.1** will be used as framwork for logging;
 
 ## 5. Conclusion
-I expect my humble implementation fulfill your expectations, as well provide for you the desired technical results you are looking for.
-
-Participating in this selection process is being a joy and an awesome personal experience, so I thank you and congratulate every person I had contact with since my first steps applying for this position!
+I expect my implementation fulfill your expectations, as well, provide you the desired technical results you are looking for.
 
 If you have any questions or need any additional information or explanation, feel free to contact me. I'll be available and ready.
 

@@ -1,12 +1,34 @@
 using ArchitectCodingChallenge.Application;
 using ArchitectCodingChallenge.Infrastructure;
+using ArchitectCodingChallenge.Presentation.Middlewares;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Serialization;
+using Serilog;
+using Serilog.Events;
+using Serilog.Exceptions;
+using Serilog.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Serilog settings
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .Enrich.WithExceptionDetails()
+    .Enrich.WithCorrelationId()
+    .Enrich.WithProperty("ApplicationName", $"ArchitectCodingChallenge API {Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")}")
+    .Filter.ByExcluding(Matching.FromSource("Microsoft.AspNetCore.StaticFiles"))
+    .Filter.ByExcluding(z => z.MessageTemplate.Text.Contains("Business error"))
+    .WriteTo.Async(wt => wt.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}"))
+    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+builder.Host.UseSerilog(Log.Logger);
 
-builder.Services.AddControllers();
+// Services
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(setup => {
+        setup.SerializerSettings.ContractResolver = new DefaultContractResolver();
+    });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => {
     c.SwaggerDoc("v1", new OpenApiInfo {
@@ -25,6 +47,7 @@ builder.Services.AddSwaggerGen(c => {
     });
 });
 builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGenNewtonsoftSupport();
 
 // Adds the application and infrastructure services needed for the application
 builder.Services
@@ -33,6 +56,9 @@ builder.Services
 
 
 var app = builder.Build();
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
+app.UseMiddleware<RequestSerilogMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {

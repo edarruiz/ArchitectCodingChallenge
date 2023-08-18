@@ -93,28 +93,28 @@ public sealed class Person : Entity {
             return Result.Fail<Person>(DomainErrors.Person.IdIsNull);
         }
         if (id < 0) {
-            return Result.Fail<Person>(DomainErrors.Person.IdIsNegative);
+            return Result.Fail<Person>($"{DomainErrors.Person.IdIsNegative}, PersonId: {id}");
         }
         if (string.IsNullOrWhiteSpace(firstName)) {
-            return Result.Fail<Person>(DomainErrors.Person.NameIsNullEmptyOrWhiteSpace);
+            return Result.Fail<Person>($"{DomainErrors.Person.NameIsNullEmptyOrWhiteSpace}, PersonId: {id}");
         }
         if (string.IsNullOrWhiteSpace(lastName)) {
-            return Result.Fail<Person>(DomainErrors.Person.LastNameIsNullEmptyOrWhiteSpace);
+            return Result.Fail<Person>($"{DomainErrors.Person.LastNameIsNullEmptyOrWhiteSpace}, PersonId: {id}");
         }
         if (string.IsNullOrWhiteSpace(currentRole)) {
-            return Result.Fail<Person>(DomainErrors.Person.CurrentRoleIsNullEmptyOrWhiteSpace);
+            return Result.Fail<Person>($"{DomainErrors.Person.CurrentRoleIsNullEmptyOrWhiteSpace}, PersonId: {id}");
         }
         if (string.IsNullOrWhiteSpace(country)) {
-            return Result.Fail<Person>(DomainErrors.Person.CountryIsNullEmptyOrWhiteSpace);
+            return Result.Fail<Person>($"{DomainErrors.Person.CountryIsNullEmptyOrWhiteSpace}, PersonId: {id}");
         }
         if (string.IsNullOrWhiteSpace(industry)) {
-            return Result.Fail<Person>(DomainErrors.Person.IndustryIsNullEmptyOrWhiteSpace);
+            return Result.Fail<Person>($"{DomainErrors.Person.IndustryIsNullEmptyOrWhiteSpace}, PersonId: {id}");
         }
         if (numberOfRecomendations < 0) {
-            return Result.Fail<Person>(DomainErrors.Person.NumberOfRecomendationsIsNegative);
+            return Result.Fail<Person>($"{DomainErrors.Person.NumberOfRecomendationsIsNegative}, PersonId: {id}");
         }
         if (numberOfConnections < 0) {
-            return Result.Fail<Person>(DomainErrors.Person.NumberOfConnectionsIsNegative);
+            return Result.Fail<Person>($"{DomainErrors.Person.NumberOfConnectionsIsNegative}, PersonId: {id}");
         }
 
         Person person = new(guid) {

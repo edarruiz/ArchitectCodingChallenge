@@ -35,14 +35,15 @@ public interface IJsonInMemoryDatabaseContext : IPersistenceDatabaseContext {
     Assembly? ResourceAssembly { get; }
 
     /// <summary>
-    /// Gets the <see cref="List{T}"/> representing the collection of <see cref="PersonModel"/>.
-    /// </summary>
-    List<PersonModel>? People { get; }
-
-    /// <summary>
     /// Checks if the In-memory database is ready and available for operations.
     /// </summary>
     bool Connected { get; }
+
+    /// <summary>
+    /// Gets the <see cref="List{T}"/> representing the collection of <see cref="PersonModel"/> 
+    /// information existing in the file "people.json".
+    /// </summary>
+    List<PersonModel> RawPeopleDataSet { get; }
     #endregion
 
     #region Methods
@@ -67,6 +68,10 @@ public interface IJsonInMemoryDatabaseContext : IPersistenceDatabaseContext {
     /// <returns>Returns <c>true</c> when the "people.json" file contents was loaded sucessfully in-memory; <c>false</c> otherwise.</returns>
     bool LoadPeopleDataSetFromFile(string? filename);
 
-    Task<List<PersonModel>?> GetPeople();
+    /// <summary>
+    /// Save to file the changes made on the People's list.
+    /// </summary>
+    /// <returns>Returns <c>true</c> when the changes are saved successfully to the file named "people.json".
+    void SaveChanges();
     #endregion
 }

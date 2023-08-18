@@ -30,5 +30,8 @@ public sealed class FileSystem : IFileSystem {
 
     /// <inheritdoc/>
     public StreamReader OpenText(string path) => File.OpenText(path);
+
+    /// <inheritdoc/>
+    public void WriteAllText(string path, string? contents, Encoding encoding) => File.WriteAllText(path, contents, encoding);
     #endregion
 }

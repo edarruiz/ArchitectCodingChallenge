@@ -3,7 +3,9 @@ using System.Text;
 using ArchitectCodingChallenge.Domain.Models;
 using ArchitectCodingChallenge.Infrastructure.Persistence.Abstractions;
 using ArchitectCodingChallenge.Infrastructure.Persistence.InMemoryDatabase.Abstractions;
+using ArchitectCodingChallenge.Infrastructure.Persistence.InMemoryDatabase.Exceptions;
 using Newtonsoft.Json;
+using Serilog;
 
 namespace ArchitectCodingChallenge.Infrastructure.Persistence.InMemoryDatabase;
 
@@ -68,10 +70,10 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
     public Assembly? ResourceAssembly { get; init; }
 
     /// <inheritdoc/>
-    public List<PersonModel>? People { get; private set; } = new List<PersonModel>();
+    public bool Connected { get; private set; } = false;
 
     /// <inheritdoc/>
-    public bool Connected { get; private set; } = false;
+    public List<PersonModel> RawPeopleDataSet { get; private set; } = new List<PersonModel>();
 
     /// <inheritdoc/>
     public bool Connect() {
@@ -119,10 +121,10 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
             using StreamReader peopleReader = _fs.OpenText(filename);
             string peopleRawData = peopleReader.ReadToEnd();
             if (!string.IsNullOrWhiteSpace(peopleRawData)) {
-                People = JsonConvert.DeserializeObject<List<PersonModel>?>(peopleRawData);
+                RawPeopleDataSet = JsonConvert.DeserializeObject<List<PersonModel>?>(peopleRawData)!;
             }
         } catch (Exception ex) {
-            // TODO: log the exception
+            Log.Error(ex.Message);
             return false;
         }
 
@@ -130,6 +132,16 @@ public class JsonInMemoryDatabaseContext : IJsonInMemoryDatabaseContext {
     }
 
     /// <inheritdoc/>
-    public async Task<List<PersonModel>?> GetPeople() => People;
+    public void SaveChanges() {
+        if (!Connected) {
+            Connect();
+        }
+        var peopleRawData = JsonConvert.SerializeObject(RawPeopleDataSet);
+        if (!string.IsNullOrWhiteSpace(PeopleJsonFilename) && Connected) {
+            _fs.WriteAllText(PeopleJsonFilename, peopleRawData, Encoding.UTF8);
+        } else {
+            throw new JsonInMemoryDatabaseException($"The data changes could not be saved to the file '{PeopleJsonFilename}'.");
+        }
+    }
     #endregion
 }
