@@ -2,11 +2,11 @@
 
 > *Hello reader!*
 >
-> *I prepared this document to guide you through my test.*
+> *I prepared this document to guide you through my solution for this test.*
 >
-> *Here you will find all information related to the solution I provide for this test.*
+> *Here you will find all information related to the solution I provided.*
 >
-> *I'd like to thank you for your time, and for your attention while reading my code and my documentation. I did my best to provide you a good experience while evaluanting my test.*
+> *I'd like to thank you for your time, and for your attention while reading my code and my documentation. I did my best to provide you a good experience while evaluating my test.*
 >
 > *I hope you find it interesting! If you need any more information, feel free to ask me! If you also have any sugestions which could help me to improve, please let me know!*
 >
@@ -17,9 +17,9 @@ This repository contains a proposed solution for test of .NET Architect Coding C
 
 - [.NET Architect Coding Challenge](#net-architect-coding-challenge)
   - [1. Abstract: The problem](#1-abstract-the-problem)
-  - [Answer 1](#answer-1)
-  - [Answer 2](#answer-2)
-  - [Answer 3](#answer-3)
+  - [Problem 1: The Answer](#problem-1-the-answer)
+  - [Problem 2: The Answer](#problem-2-the-answer)
+  - [Problem 3: The Answer](#problem-3-the-answer)
   - [Additional information](#additional-information)
   - [2. My business perspective, design thinking and decision making for this solution](#2-my-business-perspective-design-thinking-and-decision-making-for-this-solution)
   - [3. My technology perspective, design thinking, architecture and decision making for this solution](#3-my-technology-perspective-design-thinking-architecture-and-decision-making-for-this-solution)
@@ -65,14 +65,14 @@ From the original e-mail:
 }
 ]
 ```
-## Answer 1
+## Problem 1: The Answer
 For this enpoint, I will create a <code>GET</code> method that will do the following:
 1. Load the dataset to an In-memory database, from the <code>people.json</code> file provided;
 2. Query all the data and filter the person's by its current <code>CurrentRole</code>, which needs to contains the word <code>developer</code> - which I defined being the key value to the ranking;
 3. Sort the results <code>ascending</code> by the field <code>PersonId</code>;
 4. Return all the results found as <code>application/json</code> within a <code>HTTP CODE: 200 (Ok)</code>.
 
-## Answer 2
+## Problem 2: The Answer
 For this endpoint, I will create a <code>GET</code> method what will do the following:
 1. Load the dataset to an In-memory database, from the <code>people.json</code> file provided;
 2. Query all the data and filter the person's by its <code>PersonId</code> provided by the <code>query parameter</code> named <code>N</code>;
@@ -80,7 +80,7 @@ For this endpoint, I will create a <code>GET</code> method what will do the foll
    1. <code>200</code> - return the person's information when the person's <code>PersonId</code> exists.
    2. <code>404</code> - return no results when the person's <code>PersonId</code> does not exists.
 
-## Answer 3
+## Problem 3: The Answer
 For this endpoint, I will create a <code>POST</code> method that will do the following:
 1. Receive the information inside the request <code>body</code>, as <code>application/json</code>;
 2. Do the validations based on the provided data types, required and optional fields;
@@ -119,7 +119,7 @@ Example:
 ## Additional information
 You do not need to worry how the application loads the dataset from the json file. I put the <code>people.json</code> file as an embedded resource inside the application layer, so the API handles the file system needed to persist and query the required data. For this task I created a custom In-memory database implementation based on this test needs.
 
-I did not implemented the unit tests for all classes existing in the codebase, but to demonstrate I know how to use the patterns and the good pratices, I've implemented a lot of unit tests for the core classes, for example, inheritance core classes, domain core classes and infrastructure core classes, using both traditional unit tests and also using mocks and fakes.
+I did not fully implemented the unit tests for all classes existing in the codebase, but to demonstrate I know how to use the patterns and the good pratices, I've implemented a lot of unit tests for the core classes, for example, inheritance core classes, domain core classes and infrastructure core classes, using both traditional unit tests and also using mocks and fakes.
 
 ## 2. My business perspective, design thinking and decision making for this solution
 Every good software solution is always preceeded by a good understanding of the bussines needs, their goals, the market rules and the end-user expectations.
@@ -203,7 +203,7 @@ With this in mind, here I bring are some of the design thinking process I had, p
 > - **Serilog, version 3.0.1** will be used as framwork for logging;
 
 ## 5. Conclusion
-I expect my implementation fulfill your expectations, as well, provide you the desired technical results you are looking for.
+I expect my implementation fulfill your expectations, as well, provide you the desired technical details and results you are looking for.
 
 If you have any questions or need any additional information or explanation, feel free to contact me. I'll be available and ready.
 
