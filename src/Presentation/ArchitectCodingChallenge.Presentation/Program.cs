@@ -1,3 +1,4 @@
+using System.Reflection;
 using ArchitectCodingChallenge.Application;
 using ArchitectCodingChallenge.Infrastructure;
 using ArchitectCodingChallenge.Presentation.Middlewares;
@@ -46,7 +47,9 @@ builder.Services.AddSwaggerGen(c => {
         }
     });
 });
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(setup => {
+    setup.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
+});
 builder.Services.AddSwaggerGenNewtonsoftSupport();
 
 // Adds the application and infrastructure services needed for the application

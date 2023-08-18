@@ -31,13 +31,16 @@ public class PeopleController : ControllerBase {
 
     #region HTTP Methods
     /// <summary>
-    /// An endpoint that finds the N people with the highest chance of becoming our clients.
+    /// Problem 1: An endpoint that finds the N people with the highest chance of becoming our clients.
     /// </summary>
     /// <param name="n">Maximum number of people to be found, with the highets chance of becoming clients.</param>
-    /// <returns></returns>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <response code="200">The N people with the highest change of becoming our clients.</response>
+    /// <response code="400">The error message when a search problem occurs.</response>
     [HttpGet]
     [Route("topclients/{n}")]
-    //[Produces()]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
     public async Task<ActionResult> GetTopClients(
         int n,
         CancellationToken cancellationToken
@@ -56,12 +59,16 @@ public class PeopleController : ControllerBase {
     }
 
     /// <summary>
-    /// An endpoint that finds, for a given <c>PersonId</c>, the position on the priority potential clients list.
+    /// Problem 2: An endpoint that finds, for a given <c>PersonId</c>, the position on the priority potential clients list.
     /// </summary>
     /// <param name="personId">The person unique identification number.</param>
-    /// <returns></returns>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <response code="200">The position on the priority clients list.</response>
+    /// <response code="400">The error message when a search problem occurs.</response>
     [HttpGet]
     [Route("clientposition/{personId}")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
     public async Task<ActionResult> GetClientPosition(
         long personId,
         CancellationToken cancellationToken
@@ -79,12 +86,21 @@ public class PeopleController : ControllerBase {
 #pragma warning restore CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
     }
 
+    /// <summary>
+    /// Bonus implementation: Another endpoint that allows the insertion of a new Person object and calculates its priority value.
+    /// </summary>
+    /// <param name="request">The list containing the new people to be added in the list.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <response code="200">The results on every persons create action.</response>
+    /// <response code="400">The error message when a search problem occurs.</response>
     [HttpPost]
     [Route("create")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
     public async Task<IActionResult> CreatePeople(
-        [FromBody] CreatePeopleCommand request,
-        CancellationToken cancellationToken
-    ) {
+    [FromBody] CreatePeopleCommand request,
+    CancellationToken cancellationToken
+) {
         var response = await _mediator.Send(request, cancellationToken);
 
         if (response is null) {

@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using ArchitectCodingChallenge.Domain.Validators;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +19,9 @@ public static class DependencyInjection {
 
         // Add MediatR Services
         services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(assembly));
+
+        // Add Fluent Validation Services
+        services.AddValidatorsFromAssemblyContaining<PersonModelValidator>();
 
         // Add Fluent Validation Services
         services.AddValidatorsFromAssembly(assembly);
