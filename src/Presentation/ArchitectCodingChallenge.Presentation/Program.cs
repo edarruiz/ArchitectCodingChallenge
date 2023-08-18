@@ -1,4 +1,3 @@
-using System.Reflection;
 using ArchitectCodingChallenge.Application;
 using ArchitectCodingChallenge.Infrastructure;
 using ArchitectCodingChallenge.Presentation.Middlewares;
@@ -48,7 +47,10 @@ builder.Services.AddSwaggerGen(c => {
     });
 });
 builder.Services.AddSwaggerGen(setup => {
-    setup.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
+    setup.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"ArchitectCodingChallenge.Application.xml"));
+    setup.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"ArchitectCodingChallenge.Domain.xml"));
+    setup.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"ArchitectCodingChallenge.Infrastructure.xml"));
+    setup.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"ArchitectCodingChallenge.Presentation.xml"));
 });
 builder.Services.AddSwaggerGenNewtonsoftSupport();
 
