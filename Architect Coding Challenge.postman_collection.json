@@ -1,0 +1,96 @@
+{
+	"info": {
+		"_postman_id": "ce69b3a7-6bc6-4d0c-b5ae-60e975170e7d",
+		"name": "Architect Coding Challenge",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10106280"
+	},
+	"item": [
+		{
+			"name": "TopClients",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7057/api/people/topclients/:n",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7057",
+					"path": [
+						"api",
+						"people",
+						"topclients",
+						":n"
+					],
+					"variable": [
+						{
+							"key": "n",
+							"value": "50"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetClientPosition",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7057/api/people/clientposition/:personId",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7057",
+					"path": [
+						"api",
+						"people",
+						"clientposition",
+						":personId"
+					],
+					"variable": [
+						{
+							"key": "personId",
+							"value": "644200863"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreatePeople",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"People\": [\r\n        {\r\n            \"PersonId\": 458000,\r\n            \"FirstName\": \"Jhon\",\r\n            \"LastName\": \"Smith\",\r\n            \"CurrentRole\": \"co-founder & cto\",\r\n            \"Country\": \"Germany\",\r\n            \"Industry\": \"United States\",\r\n            \"NumberOfRecommendations\": 10,\r\n            \"NumberOfConnections\": 500\r\n        },\r\n        {\r\n            \"PersonId\": 1,\r\n            \"FirstName\": \"tina\",\r\n            \"LastName\": \"gunnarsson\",\r\n            \"CurrentRole\": \"web developer\",\r\n            \"Country\": \"United States\",\r\n            \"Industry\": \"Internet\",\r\n            \"NumberOfRecommendations\": 0,\r\n            \"NumberOfConnections\": 0\r\n        },\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:7057/api/people/create",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7057",
+					"path": [
+						"api",
+						"people",
+						"create"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
